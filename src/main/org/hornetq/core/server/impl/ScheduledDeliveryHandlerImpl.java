@@ -13,6 +13,7 @@
 package org.hornetq.core.server.impl;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -41,6 +42,8 @@ public class ScheduledDeliveryHandlerImpl implements ScheduledDeliveryHandler
 
    private static final boolean trace = ScheduledDeliveryHandlerImpl.log.isTraceEnabled();
 
+   private static final MessageReferenceComparator comparator = new MessageReferenceComparator();
+   
    private final ScheduledExecutorService scheduledExecutor;
 
    private final Object lockDelivery = new Object();
@@ -77,6 +80,8 @@ public class ScheduledDeliveryHandlerImpl implements ScheduledDeliveryHandler
                // We do the opposite what the parameter says as the Runnable will always add it to the head
                scheduledReferences.add(ref);
             }
+            
+            Collections.sort(scheduledReferences, comparator);
          }
 
          scheduleDelivery(runnable, deliveryTime);
@@ -196,6 +201,10 @@ public class ScheduledDeliveryHandlerImpl implements ScheduledDeliveryHandler
                      }
 
                      references.add(reference);
+                  }
+                  else
+                  {
+                     break;
                   }
                }
             }
