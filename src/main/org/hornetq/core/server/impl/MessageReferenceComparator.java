@@ -10,14 +10,23 @@ public class MessageReferenceComparator implements Comparator<MessageReference>
    {
       long diff = ref1.getScheduledDeliveryTime() - ref2.getScheduledDeliveryTime();
 
-      if (diff < 0)
+      if (diff < 0L)
       {
          return -1;
       }
-      if (diff > 0)
+      if (diff > 0L)
       {
          return 1;
       }
-      return 0;
+      // Even if ref1 and ref2 have the same delivery time, we only want to return 0 if they are identical
+      if (ref1 == ref2)
+      {
+         return 0;
+      }
+      else
+      {
+         // Same delivery time, different objects
+         return 1;
+      }
    }
 }

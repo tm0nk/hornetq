@@ -13,12 +13,12 @@
 package org.hornetq.core.server.impl;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeSet;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -42,13 +42,11 @@ public class ScheduledDeliveryHandlerImpl implements ScheduledDeliveryHandler
 
    private static final boolean trace = ScheduledDeliveryHandlerImpl.log.isTraceEnabled();
 
-   private static final MessageReferenceComparator comparator = new MessageReferenceComparator();
-   
    private final ScheduledExecutorService scheduledExecutor;
 
    private final Object lockDelivery = new Object();
 
-   private LinkedList<MessageReference> scheduledReferences = new LinkedList<MessageReference>();
+   private TreeSet<MessageReference> scheduledReferences = new TreeSet<MessageReference>(new MessageReferenceComparator());
 
    public ScheduledDeliveryHandlerImpl(final ScheduledExecutorService scheduledExecutor)
    {
@@ -70,18 +68,7 @@ public class ScheduledDeliveryHandlerImpl implements ScheduledDeliveryHandler
 
          synchronized (scheduledReferences)
          {
-            if (tail)
-            {
-               // We do the opposite what the parameter says as the Runnable will always add it to the head
-               scheduledReferences.addFirst(ref);
-            }
-            else
-            {
-               // We do the opposite what the parameter says as the Runnable will always add it to the head
-               scheduledReferences.add(ref);
-            }
-            
-            Collections.sort(scheduledReferences, comparator);
+            scheduledReferences.add(ref);
          }
 
          scheduleDelivery(runnable, deliveryTime);
